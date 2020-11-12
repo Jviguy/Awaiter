@@ -64,6 +64,9 @@ func (m *MessageDeleteAwaiter) RemoveEntry(k int) {
 
 //The function added to the *discordgo.Session called when a message is sent
 func (m *MessageDeleteAwaiter) handle(s *discordgo.Session,msg *discordgo.MessageDelete) {
+	if msg.Author.Bot {
+		return
+	}
 	for k,entry := range m.Entries {
 		if entry.GetChannelId() == msg.ChannelID{
 			entry.channel <- msg.BeforeDelete
@@ -72,3 +75,7 @@ func (m *MessageDeleteAwaiter) handle(s *discordgo.Session,msg *discordgo.Messag
 	}
 }
 
+//Initializes a new MessageDeleteAwaiter ready for use
+func NewMessageDeleteAwaiter(s *discordgo.Session) *MessageDeleteAwaiter{
+	return &MessageDeleteAwaiter{session: s,Entries: make([]MessageDeleteEntry,0)}
+}
