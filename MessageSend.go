@@ -88,6 +88,8 @@ func (m *MessageSendAwaiter) handle(s *discordgo.Session,msg *discordgo.MessageC
 }
 
 //Initializes a new MessageSendAwaiter ready for use
-func NewMessageSendAwaiter(s *discordgo.Session) *MessageDeleteAwaiter{
-	return &MessageDeleteAwaiter{session: s,Entries: make([]MessageDeleteEntry,0)}
+func NewMessageSendAwaiter(s *discordgo.Session) *MessageSendAwaiter{
+	awaiter := &MessageSendAwaiter{session: s,Entries: make([]MessageSendEntry,0)}
+	s.AddHandler(awaiter.handle)
+	return awaiter
 }
