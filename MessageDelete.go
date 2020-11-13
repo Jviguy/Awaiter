@@ -16,6 +16,8 @@ type MessageDeleteEntry struct {
 	channelId string
 	//The channel to return to when a message appears in the specified channel named by channelId
 	channel chan *discordgo.Message
+	//A bool representing wether to allow bot messages to set off the reciever
+	includeBots bool
 }
 
 //Returns the channel that will be returned too
@@ -28,12 +30,16 @@ func (m *MessageDeleteEntry) GetChannelId() string {
 	return m.channelId
 }
 
+func (m *MessageDeleteEntry) IncludeBots() bool {
+	return m.includeBots
+}
+
 //Adds a Entry to the MessageDeleteAwaiter and returns the message when it is received.
-func (m *MessageDeleteAwaiter) AwaitDeletedMessage(channelId string) *discordgo.Message {
+func (m *MessageDeleteAwaiter) AwaitDeletedMessage(channelId string,IncludeBots bool) *discordgo.Message {
 	//Make the channel
 	channel := make(chan *discordgo.Message)
 	//Form the Entry
-	entry := MessageDeleteEntry{channelId,channel}
+	entry := MessageDeleteEntry{channelId,channel,IncludeBots}
 	//Add the Entry
 	m.Await(entry)
 	//return the recieved message from the channel
@@ -64,12 +70,17 @@ func (m *MessageDeleteAwaiter) RemoveEntry(k int) {
 
 //The function added to the *discordgo.Session called when a message is sent
 func (m *MessageDeleteAwaiter) handle(s *discordgo.Session,msg *discordgo.MessageDelete) {
-	if msg.Author.Bot {
+	if msg.Author.ID == s.State.User.ID {
 		return
 	}
-	for k,entry := range m.Entries {
-		if entry.GetChannelId() == msg.ChannelID{
-			entry.channel <- msg.BeforeDelete
+	for k , entry := range m.Entries {
+		if entry.GetChannelId() == msg.ID{
+			if !entry.IncludeBots() {
+				if msg.Author.Bot {
+					return
+				}
+			}
+			entry.GetChannel() <- msg.BeforeDelete
 			m.RemoveEntry(k)
 		}
 	}

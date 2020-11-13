@@ -16,6 +16,13 @@ type MessageSendEntry struct {
 	channelId string
 	//The channel to return to when a message appears in the specified channel named by channelId
 	channel chan *discordgo.MessageCreate
+	//if true the if bot check will be ignored
+	includeBots bool
+}
+
+//Returns wether to include bots in the await
+func (m MessageSendEntry) IncludeBots() bool {
+	return m.includeBots
 }
 
 //Returns the channel that will be returned too
@@ -34,11 +41,11 @@ func (m *MessageSendAwaiter) Await(entry MessageSendEntry) {
 }
 
 //Adds a Entry to the MessageSendAwaiter and returns the message when it is received.
-func (m *MessageSendAwaiter) AwaitMessage(channelId string) *discordgo.MessageCreate {
+func (m *MessageSendAwaiter) AwaitMessage(channelId string,IncludeBots bool) *discordgo.MessageCreate {
 	//Make the channel
 	channel := make(chan *discordgo.MessageCreate)
 	//Form the Entry
-	entry := MessageSendEntry{channelId,channel}
+	entry := MessageSendEntry{channelId,channel,IncludeBots}
 	//Add the Entry
 	m.Await(entry)
 	//return the recieved message from the channel
@@ -64,18 +71,23 @@ func (m *MessageSendAwaiter) RemoveEntry(k int) {
 
 //The function added to the *discordgo.Session called when a message is sent
 func (m *MessageSendAwaiter) handle(s *discordgo.Session,msg *discordgo.MessageCreate)  {
-	if msg.Author.Bot {
+	if msg.Author.ID == s.State.User.ID {
 		return
 	}
 	for k , entry := range m.Entries {
 		if entry.GetChannelId() == msg.ID{
+			if !entry.IncludeBots() {
+				if msg.Author.Bot {
+					return
+				}
+			}
 			entry.GetChannel() <- msg
 			m.RemoveEntry(k)
 		}
 	}
 }
 
-//Initializes a new MessageDeleteAwaiter ready for use
+//Initializes a new MessageSendAwaiter ready for use
 func NewMessageSendAwaiter(s *discordgo.Session) *MessageDeleteAwaiter{
 	return &MessageDeleteAwaiter{session: s,Entries: make([]MessageDeleteEntry,0)}
 }

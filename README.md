@@ -5,11 +5,13 @@ A Discordgo helper allowing for the use of AwaiteMessages(channelId) like thing
 package main
 
 import (
-  "github.com/bwmarrin/discordgo"
-  "github.com/Jviguy/Awaiter"
+    "fmt"
+    "github.com/Jviguy/Awaiter"
+    "github.com/bwmarrin/discordgo"
+    "os"
 )
 
-var awaiter Awaiter.MessageSendAwaiter
+var awaiter *Awaiter.MessageSendAwaiter
 
 func main() {
   	// Create a new Discord session using the provided bot token.
@@ -22,7 +24,7 @@ func main() {
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(messageCreate)
   
-  awaiter = Awaiter.NewMessageSendAwaiter(dg)
+    awaiter = Awaiter.NewMessageSendAwaiter(dg)
   
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
@@ -54,7 +56,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// If the message is "!awaitMessage" log the next message
 	if m.Content == "!awaitMessage" {
     //await a new message
-    msg := awaiter.AwaitMessage(m.ChannelId)
+    msg := awaiter.AwaitMessage(m.ChannelId,false)
     //print it
     fmt.Println(msg.Content)
   }
