@@ -4,8 +4,10 @@ import "github.com/bwmarrin/discordgo"
 
 //An Awaiter for awaiting messages to be sent in a said channel
 type MessageSendAwaiter struct {
+
 	//A slice of Entries belonging to this Awaiter
 	Entries []MessageSendEntry
+
 	//The *discordgo.Session this awaiter belongs to
 	session *discordgo.Session
 }
