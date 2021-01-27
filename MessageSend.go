@@ -1,6 +1,8 @@
 package Awaiter
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/bwmarrin/discordgo"
+)
 
 //An Awaiter for awaiting messages to be sent in a said channel
 type MessageSendAwaiter struct {
@@ -39,15 +41,15 @@ func (m MessageSendEntry) GetChannelId() string {
 
 //Adds a Entry to the MessageSendAwaiter and has to be manually handled.
 func (m *MessageSendAwaiter) Await(entry MessageSendEntry) {
-	m.Entries = append(m.Entries,entry)
+	m.Entries = append(m.Entries, entry)
 }
 
 //Adds a Entry to the MessageSendAwaiter and returns the message when it is received.
-func (m *MessageSendAwaiter) AwaitMessage(channelId string,IncludeBots bool) *discordgo.MessageCreate {
+func (m *MessageSendAwaiter) AwaitMessage(channelId string, IncludeBots bool) *discordgo.MessageCreate {
 	//Make the channel
 	channel := make(chan *discordgo.MessageCreate)
 	//Form the Entry
-	entry := MessageSendEntry{channelId,channel,IncludeBots}
+	entry := MessageSendEntry{channelId, channel, IncludeBots}
 	//Add the Entry
 	m.Await(entry)
 	//return the recieved message from the channel
@@ -72,12 +74,12 @@ func (m *MessageSendAwaiter) RemoveEntry(k int) {
 }
 
 //The function added to the *discordgo.Session called when a message is sent
-func (m *MessageSendAwaiter) handle(s *discordgo.Session,msg *discordgo.MessageCreate)  {
+func (m *MessageSendAwaiter) handle(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	if msg.Author.ID == s.State.User.ID {
 		return
 	}
-	for k , entry := range m.Entries {
-		if entry.GetChannelId() == msg.ID{
+	for k, entry := range m.Entries {
+		if entry.GetChannelId() == msg.ChannelID {
 			if !entry.IncludeBots() {
 				if msg.Author.Bot {
 					return
@@ -90,8 +92,8 @@ func (m *MessageSendAwaiter) handle(s *discordgo.Session,msg *discordgo.MessageC
 }
 
 //Initializes a new MessageSendAwaiter ready for use
-func NewMessageSendAwaiter(s *discordgo.Session) *MessageSendAwaiter{
-	awaiter := &MessageSendAwaiter{session: s,Entries: make([]MessageSendEntry,0)}
+func NewMessageSendAwaiter(s *discordgo.Session) *MessageSendAwaiter {
+	awaiter := &MessageSendAwaiter{session: s, Entries: make([]MessageSendEntry, 0)}
 	s.AddHandler(awaiter.handle)
 	return awaiter
 }

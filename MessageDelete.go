@@ -35,11 +35,11 @@ func (m *MessageDeleteEntry) IncludeBots() bool {
 }
 
 //Adds a Entry to the MessageDeleteAwaiter and returns the message when it is received.
-func (m *MessageDeleteAwaiter) AwaitDeletedMessage(channelId string,IncludeBots bool) *discordgo.Message {
+func (m *MessageDeleteAwaiter) AwaitDeletedMessage(channelId string, IncludeBots bool) *discordgo.Message {
 	//Make the channel
 	channel := make(chan *discordgo.Message)
 	//Form the Entry
-	entry := MessageDeleteEntry{channelId,channel,IncludeBots}
+	entry := MessageDeleteEntry{channelId, channel, IncludeBots}
 	//Add the Entry
 	m.Await(entry)
 	//return the recieved message from the channel
@@ -47,8 +47,8 @@ func (m *MessageDeleteAwaiter) AwaitDeletedMessage(channelId string,IncludeBots 
 }
 
 //Adds a Entry to the MessageDeleteAwaiter and has to be manually handled.
-func (m *MessageDeleteAwaiter) Await(entry MessageDeleteEntry)  {
-	m.Entries = append(m.Entries,entry)
+func (m *MessageDeleteAwaiter) Await(entry MessageDeleteEntry) {
+	m.Entries = append(m.Entries, entry)
 }
 
 //Returns the *discordgo.Session that the Awaiter has been added to.
@@ -69,12 +69,12 @@ func (m *MessageDeleteAwaiter) RemoveEntry(k int) {
 }
 
 //The function added to the *discordgo.Session called when a message is sent
-func (m *MessageDeleteAwaiter) handle(s *discordgo.Session,msg *discordgo.MessageDelete) {
+func (m *MessageDeleteAwaiter) handle(s *discordgo.Session, msg *discordgo.MessageDelete) {
 	if msg.Author.ID == s.State.User.ID {
 		return
 	}
-	for k , entry := range m.Entries {
-		if entry.GetChannelId() == msg.ID{
+	for k, entry := range m.Entries {
+		if entry.GetChannelId() == msg.ChannelID {
 			if !entry.IncludeBots() {
 				if msg.Author.Bot {
 					return
@@ -87,8 +87,8 @@ func (m *MessageDeleteAwaiter) handle(s *discordgo.Session,msg *discordgo.Messag
 }
 
 //Initializes a new MessageDeleteAwaiter ready for use
-func NewMessageDeleteAwaiter(s *discordgo.Session) *MessageDeleteAwaiter{
-	awaiter := &MessageDeleteAwaiter{session: s,Entries: make([]MessageDeleteEntry,0)}
+func NewMessageDeleteAwaiter(s *discordgo.Session) *MessageDeleteAwaiter {
+	awaiter := &MessageDeleteAwaiter{session: s, Entries: make([]MessageDeleteEntry, 0)}
 	s.AddHandler(awaiter.handle)
 	return awaiter
 }
