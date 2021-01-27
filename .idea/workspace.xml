@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d1ad108a-b3c3-4aff-97c6-8b58fb80740d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/MessageReactionAdd.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entry.go" beforeDir="false" afterPath="$PROJECT_DIR$/Entry.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MessageSend.go" beforeDir="false" afterPath="$PROJECT_DIR$/MessageSend.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

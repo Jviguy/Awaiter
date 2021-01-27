@@ -2,4 +2,4 @@ module github.com/Jviguy/Awaiter
 
 go 1.14
 
-require github.com/bwmarrin/discordgo latest // indirect
+require github.com/bwmarrin/discordgo v0.23.1 // indirect
